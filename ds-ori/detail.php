@@ -1,0 +1,47 @@
+<?php
+    if(isset($_GET['msg'])){
+        $msg    =$_GET['msg'];
+    }
+    else {
+        die ("Error. No msg selected!");    
+    }
+    include "connect.php";
+    $query    =mysqli_query($conn, "SELECT * FROM tamu WHERE msg='$msg'");
+    $result    =mysqli_fetch_array($query);
+?>
+<html>
+<head>
+    <title>Detail Number Digital Signature</title>
+</head>
+<body>
+    <h2>Detail Number Digital Signature</h2>
+    <p><i>Note: Dibawah ini adalah Detail Number Digital Signature berdasarkan msg</i> <b><?php echo $msg?></b></p>
+    <table border="0" cellpadding="4">
+        <tr>
+            <td size="90">Nama Klien</td>
+            <td>: <?php echo $result['name']?></td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td>: <?php echo $result['email']?></td>
+        </tr>
+        <tr>
+            <td>Keterangan</td>
+            <td>: <?php echo $result['address']?>, <?php echo $result['address']?></td>
+        </tr>
+        <tr>
+            <td>Kota</td>
+            <td>: <?php echo $result['city']?></td>
+        </tr>
+        <tr>
+            <td>Angka Acak</td>
+			<td>: <b><?php echo $result['msg']?></b></td>
+        </tr>
+
+        <tr height="40">
+            <td></td>
+            <td>   <a href="./">Kembali</a></td>
+        </tr>
+    </table>
+</body>
+</html>
