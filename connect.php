@@ -5,7 +5,7 @@
 include_once __DIR__ . '/load_secrets.php';
 $hostmysql = getenv('DS_DB_HOST') ?: "localhost";
 $username = getenv('DS_DB_USER') ?: "t42590_ds";
-$password = getenv('DS_DB_PASSWORD') ?: "REDACTED_ROTATED_PASSWORD";
+$password = getenv('DS_DB_PASSWORD') ?: "CHANGE_ME_SET_VIA_SECRETS_PHP";
 $database = getenv('DS_DB_NAME') ?: "t42590_digitalsignature";
 
 // Sejak PHP 8.1, mysqli default melempar exception saat gagal konek
