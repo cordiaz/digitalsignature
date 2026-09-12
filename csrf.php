@@ -3,7 +3,7 @@
 // Pemanggil wajib sudah memanggil session_start() sebelum memakai fungsi ini.
 //
 // Cara pakai:
-//   - Di form: <?php echo csrf_field(); ?>
+//   - Di form: panggil echo csrf_field() di dalam blok PHP form.
 //   - Di handler POST: if (!csrf_verify($_POST['csrf_token'] ?? '')) { ...tolak... }
 
 function csrf_token() {
