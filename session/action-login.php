@@ -1,7 +1,9 @@
 <?php
-    // Kredensial dapat dioverride lewat environment variable agar tidak perlu
-    // mengubah kode saat rotasi password. Hash di bawah adalah fallback untuk
-    // password default "passwordlogin" (bcrypt, dibuat dengan password_hash()).
+    // Kredensial dapat dioverride lewat environment variable (atau file
+    // secrets.php di luar document root, lihat load_secrets.php) agar tidak
+    // perlu mengubah kode saat rotasi password. Hash di bawah adalah fallback
+    // untuk password default "passwordlogin" (bcrypt, dibuat dengan password_hash()).
+    include_once __DIR__ . '/../load_secrets.php';
     $usernamelogin = getenv('DS_LOGIN_USERNAME') ?: 'rizky';
     $passwordlogin_hash = getenv('DS_LOGIN_PASSWORD_HASH')
         ?: '$2b$10$cK366Am2/mfNEnyUt7M34e3dp8XX3sGpQ52oFP6aUgTVRI22I/GVq';
