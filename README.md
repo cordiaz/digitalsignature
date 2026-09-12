@@ -83,9 +83,9 @@ Ringkasan pekerjaan yang sudah dilakukan sampai kondisi saat ini, urut dari yang
     - **Endpoint insert tanpa autentikasi**: `simpan.php`, `simpan.php.ori`, `simpantest.php`, `ds-ori/simpan.php`.
 
     Semua file di atas (plus `form.html`, `tabel.html`, `validjs.js`, `search.php`, `search-app.php`, `index.php.ori`, `session/test-app.php`, dan folder `ds-ori/`) sudah **dihapus** karena tidak dipakai alur aktif (`login.php` → `index.php` → `generate_link.php` → `detail.php`) dan tidak ada nilai untuk dipertahankan.
+12. **Rotasi password DB** — password DB yang sempat ter-commit ke git history (lihat poin 4) sudah dirotasi ulang lewat Plesk dan `secrets.php` di server sudah diperbarui. Koneksi sudah dikonfirmasi normal dengan password baru.
 
 ### Yang Masih Perlu Diperhatikan
 
 - Kolom `timestamp` dipakai di `detail.php` tapi tidak ada di skema `sql.sql` — perlu dipastikan apakah kolom ini memang ada di database production atau perlu ditambahkan.
-- Password DB yang sempat ter-commit ke git history (lihat poin 4) sebaiknya dirotasi ulang untuk keamanan jangka panjang.
 - Alur aktif saat ini (`generate_link.php`, `detail.php`) belum punya rate limiting maupun CSRF protection pada form; pertimbangkan menambahkannya kalau aplikasi ini dipakai untuk data yang lebih sensitif.
