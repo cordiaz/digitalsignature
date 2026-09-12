@@ -1,15 +1,13 @@
 <?php
+session_start();
+if (!isset($_SESSION['username'])) {
+    header("Location: login.php");
+    exit;
+}
+
 // Proses penyimpanan data ke database (diletakkan di awal sebelum output HTML)
 // database connection - gunakan path yang benar (connect.php ada di folder yang sama)
 include __DIR__ . "/connect.php";
-
-// Gunakan variabel dari connect.php yang sudah di-include
-$conn = mysqli_connect($hostmysql, $username, $password, $database);
-
-// Cek koneksi
-if (!$conn) {
-    die("Koneksi database gagal: " . mysqli_connect_error());
-}
 
 // create function for generate random password
 function generate_link($len = 8) {
@@ -26,15 +24,16 @@ $kota = $_POST['city'];
 $pesan = generate_link();
 
 // sql entry data pada tabel
-$sql = "INSERT INTO tamu (name, email, address, city, msg)
-VALUES ('$name','$email','$alamat','$kota','$pesan')";
+$stmt = $conn->prepare("INSERT INTO tamu (name, email, address, city, msg) VALUES (?, ?, ?, ?, ?)");
+$stmt->bind_param("sssss", $name, $email, $alamat, $kota, $pesan);
 
-if ($conn->query($sql) === TRUE) {
+if ($stmt->execute()) {
     $insert_success = true;
 } else {
     $insert_success = false;
-    $error_msg = $conn->error;
+    $error_msg = $stmt->error;
 }
+$stmt->close();
 
 $conn->close();
 
@@ -61,12 +60,12 @@ $qr_data = "https://cordiaz.com/digitalsignature/detail.php?msg=" . $pesan;
         <?php
         if ($insert_success) {
             echo "<br>";
-            echo "Link: https://cordiaz.com/digitalsignature/detail.php?msg=" . $pesan;
+            echo "Link: https://cordiaz.com/digitalsignature/detail.php?msg=" . htmlspecialchars($pesan);
             echo "<br>";
-            echo "Nama Klien: " . $name;
+            echo "Nama Klien: " . htmlspecialchars($name);
             echo "<br>";
         } else {
-            echo "Error: " . $error_msg . "<br>";
+            echo "Error: " . htmlspecialchars($error_msg) . "<br>";
         }
         ?>
         <br>

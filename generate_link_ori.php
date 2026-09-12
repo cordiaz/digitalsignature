@@ -18,8 +18,7 @@
  
 // database connection
 include ("connect.php");
-$conn = mysqli_connect($hostmysql, $username, $password, $database) or die($conn); 
- 
+
 // create function for generate random password
 function generate_link($len = 8){
  $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -36,22 +35,22 @@ function generate_link($len = 8){
  $pesan = generate_link();
 
 // sql enty data pada tabel
-$sql = "INSERT INTO tamu (name, email, address, city, msg)
-VALUES ('$name','$email','$alamat','$kota','$pesan')";
+$stmt = $conn->prepare("INSERT INTO tamu (name, email, address, city, msg) VALUES (?, ?, ?, ?, ?)");
+$stmt->bind_param("sssss", $name, $email, $alamat, $kota, $pesan);
 
-if ($conn->query($sql) === TRUE) {
+if ($stmt->execute()) {
   //  echo "Pesan telah terkirim!";
 } else {
-    echo "Error: " . $sql . "<br>" . $conn->error;
+    echo "Error: " . htmlspecialchars($stmt->error);
 }
 
 $conn->close();
  // echo "<br>";
  ///echo "Random number is: ".$pesan;
  echo "<br>";
- echo "Link: https://cordiaz.com/digitalsignature/detail.php?msg=".$pesan;
+ echo "Link: https://cordiaz.com/digitalsignature/detail.php?msg=".htmlspecialchars($pesan);
  echo "<br>";
- echo "Nama Klien:".$name;
+ echo "Nama Klien:".htmlspecialchars($name);
  echo "<br>";
 ?>
 		<br>

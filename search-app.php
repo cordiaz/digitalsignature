@@ -1,10 +1,6 @@
 <?php
-$con = mysqli_connect("localhost","t42590_ds","2RgH5e4TaUkz7MnT","t42590_digitalsignature");
-
-if (mysqli_connect_errno()) {
-  echo "Failed to connect to MySQL: " . mysqli_connect_error();
-  exit();
-}
+include "connect.php";
+$con = $conn;
 
 // Perform query
 //if ($result = mysqli_query($con, "SELECT * FROM tamu")) {

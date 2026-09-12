@@ -1,12 +1,8 @@
 <?php
- 
+
 // database connection
-$dbhost = 'localhost';
-$dbuser = 't42590_ds';
-$dbpass = '2RgH5e4TaUkz7MnT';
-$db = 't42590_digitalsignature';
-$conn = mysqli_connect($dbhost, $dbuser, $dbpass , $db) or die($conn); 
- 
+include __DIR__ . '/../connect.php';
+
 // create function for generate random password
 function generate_link($len = 8){
  $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -20,14 +16,16 @@ if(isset($_POST['signup'])) {
  $email=$_POST['email'];
  $password = generate_link();
  $encpt_password= sha1($password);
- mysqli_query($conn, "insert into passwdgen (name, email, password) values ('$name', '$email', '$password')");
- echo "Your random link is: https://cordiaz.com/digitalsignature/detail.php?msg=".$password;
+ $stmt = $conn->prepare("insert into passwdgen (name, email, password) values (?, ?, ?)");
+ $stmt->bind_param("sss", $name, $email, $password);
+ $stmt->execute();
+ echo "Your random link is: https://cordiaz.com/digitalsignature/detail.php?msg=".htmlspecialchars($password);
  echo "<br>";
- echo "Your random SHA1 is: ".$encpt_password;
+ echo "Your random SHA1 is: ".htmlspecialchars($encpt_password);
  echo "<br>";
- echo "Your name is: ".$name;
+ echo "Your name is: ".htmlspecialchars($name);
  echo "<br>";
- echo "Your email is: ".$email;
+ echo "Your email is: ".htmlspecialchars($email);
 }
  
 ?>

@@ -11,7 +11,7 @@
 <?php 
     if(isset($_GET['cari'])){
         $cari = $_GET['cari'];
-        echo "<b>Hasil pencarian : ".$cari."</b>";
+        echo "<b>Hasil pencarian : ".htmlspecialchars($cari)."</b>";
 		echo "<br>";
     }
 ?>
@@ -22,19 +22,22 @@
     </tr>
 <?php 
     if(isset($_GET['cari'])){
-       $koneksi = mysqli_connect('localhost', 't42590_ds', '2RgH5e4TaUkz7MnT', 't42590_digitalsignature');
-		$cari = $_GET['cari'];
-        $data = mysqli_query($koneksi, "select * from tamu where msg like '%".$cari."%' "); 
+        $cari = $_GET['cari'];
+        $like = "%" . $cari . "%";
+        $stmt = $conn->prepare("select * from tamu where msg like ?");
+        $stmt->bind_param("s", $like);
+        $stmt->execute();
+        $data = $stmt->get_result();
     }
     else{
-        $data = mysqli_query("select * from tamu"); 
+        $data = mysqli_query($conn, "select * from tamu");
     }
     $no = 1;
     while($d = mysqli_fetch_array($data)){
 ?>
     <tr>
         <td><?php echo $no++; ?></td>
-        <td><?php echo $d['name']; ?></td>
+        <td><?php echo htmlspecialchars($d['name']); ?></td>
     </tr>
 <?php
     } ?>

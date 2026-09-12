@@ -24,13 +24,13 @@ $kota=$_POST['city'];
 $pesan=$_POST['msg'];
 
 // sql entry data pada tabel
-$sql = "INSERT INTO tamu (name, email, address, city, msg)
-VALUES ('$nama','$email','$alamat','$kota','$pesan')";
+$stmt = $conn->prepare("INSERT INTO tamu (name, email, address, city, msg) VALUES (?, ?, ?, ?, ?)");
+$stmt->bind_param("sssss", $nama, $email, $alamat, $kota, $pesan);
 
-if ($conn->query($sql) === TRUE) {
+if ($stmt->execute()) {
     echo "Pesan telah terkirim!";
 } else {
-    echo "Error: " . $sql . "<br>" . $conn->error;
+    echo "Error: " . htmlspecialchars($stmt->error);
 }
 
 $conn->close();

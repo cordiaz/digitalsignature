@@ -1,9 +1,10 @@
 <?php
-$hostmysql = "localhost";
-$username = "t42590_ds";
-$password = "REDACTED_ROTATED_PASSWORDREDACTED_ROTATED_PASSWORD";
-$database = "t42590_digitalsignature";
-$conn = mysqli_connect($hostmysql, $username, $password, $database);
+// Kredensial dapat dioverride lewat environment variable agar tidak perlu
+// mengubah kode saat rotasi password; nilai literal di sini hanya fallback.
+$hostmysql = getenv('DS_DB_HOST') ?: "localhost";
+$username = getenv('DS_DB_USER') ?: "t42590_ds";
+$password = getenv('DS_DB_PASSWORD') ?: "REDACTED_ROTATED_PASSWORD";
+$database = getenv('DS_DB_NAME') ?: "t42590_digitalsignature";
 
 // Gunakan @ untuk suppress error, lalu cek manual
 $conn = @mysqli_connect($hostmysql, $username, $password, $database);
