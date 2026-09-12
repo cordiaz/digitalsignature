@@ -37,9 +37,14 @@ $stmt->close();
 
 $conn->close();
 
+// Base URL diambil dari request saat ini, bukan hardcoded, supaya tidak
+// meleset kalau domain/path deployment berubah (mis. subdomain vs subfolder).
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$base_url = $scheme . '://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+
 // ** PERUBAHAN DI SINI **
 // Isi QR Code HANYA link (tanpa nama klien)
-$qr_data = "https://cordiaz.com/digitalsignature/detail.php?msg=" . $pesan;
+$qr_data = $base_url . "/detail.php?msg=" . $pesan;
 ?>
 <html>
 <head>
@@ -60,7 +65,7 @@ $qr_data = "https://cordiaz.com/digitalsignature/detail.php?msg=" . $pesan;
         <?php
         if ($insert_success) {
             echo "<br>";
-            echo "Link: https://cordiaz.com/digitalsignature/detail.php?msg=" . htmlspecialchars($pesan);
+            echo "Link: " . htmlspecialchars($base_url) . "/detail.php?msg=" . htmlspecialchars($pesan);
             echo "<br>";
             echo "Nama Klien: " . htmlspecialchars($name);
             echo "<br>";
@@ -76,7 +81,7 @@ $qr_data = "https://cordiaz.com/digitalsignature/detail.php?msg=" . $pesan;
     <script>
         // ** PERUBAHAN DI SINI **
         // Kirim hanya link ke QR code (tanpa nama)
-        var qrData = "https://cordiaz.com/digitalsignature/detail.php?msg=<?php echo $pesan; ?>";
+        var qrData = "<?php echo $base_url; ?>/detail.php?msg=<?php echo $pesan; ?>";
         window.location.href = "phpqrcode/index.php?qr_data=" + encodeURIComponent(qrData);
     </script>
     <?php endif; ?>
