@@ -21,7 +21,6 @@ Aplikasi PHP sederhana untuk membuat link "digital signature" unik per klien, me
 | `login.php`, `action-login.php`, `action-logout.php` | Autentikasi sederhana berbasis session (kredensial hardcoded/env var, bukan tabel user). |
 | `session/` | Salinan alur login/app terpisah dengan kredensial berbeda. |
 | `phpqrcode/` | Library pihak ketiga untuk generate QR code (di-vendor langsung ke repo ini). |
-| `passwd-generator/` | Utilitas generate password terpisah. |
 | `ds-ori/` | Salinan awal/referensi dari fitur utama (tidak dipakai langsung). |
 | `sql.sql` | Skema tabel `tamu`. |
 | `*.ori`, `*-ori.php` | Versi lama/referensi yang sudah tidak dipakai di alur aktif. |
@@ -77,9 +76,10 @@ Ringkasan pekerjaan yang sudah dilakukan sampai kondisi saat ini, urut dari yang
 7. **Perbaikan link/QR yang salah domain** — `generate_link.php`, `detail.php`, `phpqrcode/index.php`, `detailtest.php`, dan `passwd-generator/generate_link.php` sebelumnya hardcode base URL yang salah (`https://cordiaz.com/digitalsignature` atau `https://www.cordiaz.com/digitalsignature`), padahal aplikasi berjalan di root domain `https://digitalsignature.cordiaz.com`. Semua sudah diganti membangun base URL secara dinamis dari request saat ini, supaya tidak salah lagi kalau domain/path deployment berubah.
 8. **Redesain UI** — `login.php`, `index.php`, `detail.php`, dan `phpqrcode/index.php` diberi tampilan kartu modern (gradient background, input & tombol bergaya konsisten) menggantikan tabel HTML polos, tanpa mengubah nama field maupun alur PHP yang sudah ada.
 9. **Penyesuaian opsi QR code** — panel "Generate QR Code manual" di `phpqrcode/index.php` di-collapse (tertutup) secara default, dengan nilai default ECC = `Q` dan Size = `4`.
+10. **Bersih-bersih kode tidak terpakai** — `detailtest.php` dan folder `passwd-generator/` dihapus karena tidak lagi direferensikan di alur aktif manapun.
 
 ### Yang Masih Perlu Diperhatikan
 
-- Kolom `timestamp` dipakai di `detail.php`/`detailtest.php` tapi tidak ada di skema `sql.sql` — perlu dipastikan apakah kolom ini memang ada di database production atau perlu ditambahkan.
-- `detailtest.php`, `passwd-generator/`, dan file-file `*-ori.php`/`*.ori` adalah kode lama/tidak terpakai di alur aktif — kandidat untuk dihapus jika sudah dipastikan tidak dibutuhkan.
+- Kolom `timestamp` dipakai di `detail.php` tapi tidak ada di skema `sql.sql` — perlu dipastikan apakah kolom ini memang ada di database production atau perlu ditambahkan.
+- File-file `*-ori.php`/`*.ori` (mis. `index.php.ori`, `simpan.php.ori`, `ds-ori/`) adalah kode lama/referensi yang sudah tidak dipakai di alur aktif — kandidat untuk dihapus jika sudah dipastikan tidak dibutuhkan.
 - Password DB yang sempat ter-commit ke git history (lihat poin 4) sebaiknya dirotasi ulang untuk keamanan jangka panjang.
