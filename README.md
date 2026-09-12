@@ -21,9 +21,7 @@ Aplikasi PHP sederhana untuk membuat link "digital signature" unik per klien, me
 | `login.php`, `action-login.php`, `action-logout.php` | Autentikasi sederhana berbasis session (kredensial hardcoded/env var, bukan tabel user). |
 | `session/` | Salinan alur login/app terpisah dengan kredensial berbeda. |
 | `phpqrcode/` | Library pihak ketiga untuk generate QR code (di-vendor langsung ke repo ini). |
-| `ds-ori/` | Salinan awal/referensi dari fitur utama (tidak dipakai langsung). |
 | `sql.sql` | Skema tabel `tamu`. |
-| `*.ori`, `*-ori.php` | Versi lama/referensi yang sudah tidak dipakai di alur aktif. |
 
 ## Instalasi
 
@@ -77,9 +75,17 @@ Ringkasan pekerjaan yang sudah dilakukan sampai kondisi saat ini, urut dari yang
 8. **Redesain UI** — `login.php`, `index.php`, `detail.php`, dan `phpqrcode/index.php` diberi tampilan kartu modern (gradient background, input & tombol bergaya konsisten) menggantikan tabel HTML polos, tanpa mengubah nama field maupun alur PHP yang sudah ada.
 9. **Penyesuaian opsi QR code** — panel "Generate QR Code manual" di `phpqrcode/index.php` di-collapse (tertutup) secara default, dengan nilai default ECC = `Q` dan Size = `4`.
 10. **Bersih-bersih kode tidak terpakai** — `detailtest.php` dan folder `passwd-generator/` dihapus karena tidak lagi direferensikan di alur aktif manapun.
+11. **Audit keamanan menyeluruh & pembersihan endpoint lama** — ditemukan sejumlah file peninggalan "buku tamu" versi awal yang masih live di server dan merusak model keamanan aplikasi meski tidak dipakai alur aktif, karena PHP tetap menjalankan file apa pun yang ada di document root terlepas ada link ke sana atau tidak:
+    - **SQL injection**: `simpan.php.ori` membangun query dengan concatenation string langsung.
+    - **Bypass kode rahasia**: `detail_id.php` & `ds-ori/detail_id.php` membuka detail klien lewat `id` yang berurutan/predictable (bisa dienumerasi untuk memanen semua kode `msg` rahasia); `ds-ori/index.php` bahkan punya field `name="msg"` yang membiarkan pengguna menentukan sendiri kode rahasianya.
+    - **Broken access control**: `cari.php`, `cari1.php`, `cari-ori.php`, `search-engine.php`, `tampil.php` menampilkan/mencari seluruh data tamu tanpa login sama sekali (bahkan dump semua data kalau parameter kosong).
+    - **Stored XSS**: `tampil.php` menampilkan data tanpa `htmlspecialchars()`, sedangkan datanya bisa diisi lewat endpoint insert yang juga tanpa login.
+    - **Endpoint insert tanpa autentikasi**: `simpan.php`, `simpan.php.ori`, `simpantest.php`, `ds-ori/simpan.php`.
+
+    Semua file di atas (plus `form.html`, `tabel.html`, `validjs.js`, `search.php`, `search-app.php`, `index.php.ori`, `session/test-app.php`, dan folder `ds-ori/`) sudah **dihapus** karena tidak dipakai alur aktif (`login.php` → `index.php` → `generate_link.php` → `detail.php`) dan tidak ada nilai untuk dipertahankan.
 
 ### Yang Masih Perlu Diperhatikan
 
 - Kolom `timestamp` dipakai di `detail.php` tapi tidak ada di skema `sql.sql` — perlu dipastikan apakah kolom ini memang ada di database production atau perlu ditambahkan.
-- File-file `*-ori.php`/`*.ori` (mis. `index.php.ori`, `simpan.php.ori`, `ds-ori/`) adalah kode lama/referensi yang sudah tidak dipakai di alur aktif — kandidat untuk dihapus jika sudah dipastikan tidak dibutuhkan.
 - Password DB yang sempat ter-commit ke git history (lihat poin 4) sebaiknya dirotasi ulang untuk keamanan jangka panjang.
+- Alur aktif saat ini (`generate_link.php`, `detail.php`) belum punya rate limiting maupun CSRF protection pada form; pertimbangkan menambahkannya kalau aplikasi ini dipakai untuk data yang lebih sensitif.
