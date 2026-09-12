@@ -228,7 +228,7 @@ $filename = $PNG_TEMP_DIR.'test.png';
 
 //processing form input
 //remember to sanitize user input in real-life solution !!!
-$errorCorrectionLevel = 'L';
+$errorCorrectionLevel = 'Q';
 if (isset($_REQUEST['level']) && in_array($_REQUEST['level'], array('L','M','Q','H')))
     $errorCorrectionLevel = $_REQUEST['level'];
 
@@ -265,7 +265,7 @@ if (!empty($autoData)) {
 }
 
 //config form
-echo '<details open>
+echo '<details>
     <summary>Generate QR Code manual</summary>
     <form action="index.php" method="post">
         <div class="field">
