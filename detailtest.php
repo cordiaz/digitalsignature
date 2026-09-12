@@ -10,6 +10,9 @@
     $stmt->bind_param("s", $msg);
     $stmt->execute();
     $result = $stmt->get_result()->fetch_array();
+
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $base_url = $scheme . '://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
 ?>
 <html>
 <head>
@@ -37,7 +40,7 @@
         </tr>
         <tr>
             <td>URL</td>
-			<td>: <b>https://cordiaz.com/digitalsignature/detail.php?msg=<?php echo htmlspecialchars($result['msg'])?></b></td>
+			<td>: <b><?php echo htmlspecialchars($base_url)?>/detail.php?msg=<?php echo htmlspecialchars($result['msg'])?></b></td>
         </tr>
 		<tr>
             <td>Timestamp</td>

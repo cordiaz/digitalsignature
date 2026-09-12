@@ -19,7 +19,9 @@ if(isset($_POST['signup'])) {
  $stmt = $conn->prepare("insert into passwdgen (name, email, password) values (?, ?, ?)");
  $stmt->bind_param("sss", $name, $email, $password);
  $stmt->execute();
- echo "Your random link is: https://cordiaz.com/digitalsignature/detail.php?msg=".htmlspecialchars($password);
+ $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+ $base_url = $scheme . '://' . $_SERVER['HTTP_HOST'] . rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/');
+ echo "Your random link is: " . htmlspecialchars($base_url) . "/detail.php?msg=".htmlspecialchars($password);
  echo "<br>";
  echo "Your random SHA1 is: ".htmlspecialchars($encpt_password);
  echo "<br>";
