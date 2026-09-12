@@ -23,8 +23,7 @@
  */
     
     echo "<h1>PHP QR Code</h1><hr/>";
-    echo "https://www.cordiaz.com/digitalsignature<hr/>";
-    
+
     //set it to writable location, a place for temp generated PNG files
     $PNG_TEMP_DIR = dirname(__FILE__).DIRECTORY_SEPARATOR.'temp'.DIRECTORY_SEPARATOR;
     
