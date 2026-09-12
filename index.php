@@ -1,5 +1,6 @@
 <?php
     session_start();
+    require_once __DIR__ . '/csrf.php';
     if (!isset($_SESSION['username'])){
         header("Location: login.php");
         exit;
@@ -160,6 +161,7 @@
             <a class="logout-link" href="action-logout.php">Logout</a>
         </div>
         <form name="tamu" method="post" action="generate_link.php">
+            <?php echo csrf_field(); ?>
             <div class="field">
                 <label for="name">Nama Klien</label>
                 <input type="text" id="name" name="name" required>

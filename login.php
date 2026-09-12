@@ -1,3 +1,7 @@
+<?php
+    session_start();
+    require_once __DIR__ . '/csrf.php';
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -136,6 +140,7 @@
             <p>Silahkan login untuk melanjutkan</p>
         </div>
         <form action="action-login.php" method="post">
+            <?php echo csrf_field(); ?>
             <div class="field">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" autocomplete="username" required>

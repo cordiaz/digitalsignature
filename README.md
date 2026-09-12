@@ -18,6 +18,7 @@ Aplikasi PHP sederhana untuk membuat link "digital signature" unik per klien, me
 | `detail.php` | Menampilkan detail klien berdasarkan parameter `msg`. |
 | `connect.php` | Koneksi MySQL (kredensial via env var / `secrets.php`, lihat di bawah). |
 | `load_secrets.php` | Memuat `secrets.php` opsional dari luar document root. |
+| `csrf.php` | Helper token CSRF per-session (`csrf_field()`, `csrf_verify()`) dipakai form login & input klien. |
 | `login.php`, `action-login.php`, `action-logout.php` | Autentikasi sederhana berbasis session (kredensial hardcoded/env var, bukan tabel user). |
 | `session/` | Salinan alur login/app terpisah dengan kredensial berbeda. |
 | `phpqrcode/` | Library pihak ketiga untuk generate QR code (di-vendor langsung ke repo ini). |
@@ -84,8 +85,10 @@ Ringkasan pekerjaan yang sudah dilakukan sampai kondisi saat ini, urut dari yang
 
     Semua file di atas (plus `form.html`, `tabel.html`, `validjs.js`, `search.php`, `search-app.php`, `index.php.ori`, `session/test-app.php`, dan folder `ds-ori/`) sudah **dihapus** karena tidak dipakai alur aktif (`login.php` → `index.php` → `generate_link.php` → `detail.php`) dan tidak ada nilai untuk dipertahankan.
 12. **Rotasi password DB** — password DB yang sempat ter-commit ke git history (lihat poin 4) sudah dirotasi ulang lewat Plesk dan `secrets.php` di server sudah diperbarui. Koneksi sudah dikonfirmasi normal dengan password baru.
+13. **CSRF protection** — `csrf.php` menambahkan token CSRF per-session (`csrf_field()` untuk menyisipkan token di form, `csrf_verify()` untuk memvalidasi). Dipasang di form login (`login.php` → `action-login.php`) dan form input klien (`index.php` → `generate_link.php`); submit tanpa token yang valid akan ditolak dan diarahkan kembali ke form.
+14. **Kolom `timestamp`** — sudah dikonfirmasi ada di database production, meski tidak tercantum di `sql.sql` (skema di repo ini sedikit tertinggal dari skema production).
 
 ### Yang Masih Perlu Diperhatikan
 
-- Kolom `timestamp` dipakai di `detail.php` tapi tidak ada di skema `sql.sql` — perlu dipastikan apakah kolom ini memang ada di database production atau perlu ditambahkan.
-- Alur aktif saat ini (`generate_link.php`, `detail.php`) belum punya rate limiting maupun CSRF protection pada form; pertimbangkan menambahkannya kalau aplikasi ini dipakai untuk data yang lebih sensitif.
+- Skema `sql.sql` di repo belum mencantumkan kolom `timestamp` yang sudah ada di production — sebaiknya disinkronkan supaya `sql.sql` bisa dipakai untuk setup ulang database dari nol.
+- Belum ada rate limiting pada percobaan login maupun pengisian form `generate_link.php`; pertimbangkan menambahkannya kalau aplikasi ini dipakai untuk data yang lebih sensitif atau traffic publik yang lebih tinggi.

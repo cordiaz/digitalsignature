@@ -1,7 +1,14 @@
 <?php
 session_start();
+require_once __DIR__ . '/csrf.php';
 if (!isset($_SESSION['username'])) {
     header("Location: login.php");
+    exit;
+}
+
+// Tolak submit tanpa CSRF token yang valid (mis. dari form asing / CSRF attack)
+if (!csrf_verify($_POST['csrf_token'] ?? '')) {
+    header("Location: index.php");
     exit;
 }
 
