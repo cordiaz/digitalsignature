@@ -265,7 +265,7 @@ if (!empty($autoData)) {
 }
 
 //config form
-echo '<details' . (empty($autoData) ? ' open' : '') . '>
+echo '<details open>
     <summary>Generate QR Code manual</summary>
     <form action="index.php" method="post">
         <div class="field">
