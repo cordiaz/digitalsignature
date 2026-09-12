@@ -63,3 +63,23 @@ php -r "echo password_hash('password_baru_anda', PASSWORD_BCRYPT), PHP_EOL;"
 - `connect.php` mematikan mode exception mysqli (`mysqli_report(MYSQLI_REPORT_OFF)`) agar kegagalan koneksi ditangani secara manual dan tidak membocorkan detail internal (username/host) ke pengguna.
 - Semua query menggunakan prepared statement (`mysqli::prepare` + `bind_param`).
 - Output ke HTML di-escape dengan `htmlspecialchars()`.
+
+## Progress / Riwayat Perubahan
+
+Ringkasan pekerjaan yang sudah dilakukan sampai kondisi saat ini, urut dari yang paling lama:
+
+1. **Perbaikan keamanan awal** — SQL injection, XSS, auth bypass, dan kredensial hardcoded diperbaiki (query jadi prepared statement, output di-escape, kredensial mulai memakai `getenv()`).
+2. **Mekanisme `secrets.php`** — `load_secrets.php` ditambahkan agar kredensial asli (DB & login) bisa disimpan di satu file *di luar document root* (`secrets.php`), bukan hardcoded di kode maupun bergantung pada dukungan environment variable dari panel hosting.
+3. **Perbaikan bug koneksi DB** — sejak PHP 8.1, `mysqli_connect()` melempar exception saat gagal (bukan sekadar `false`), sehingga error asli (berisi username/host) sempat bocor ke halaman. Ditambahkan `mysqli_report(MYSQLI_REPORT_OFF)` agar kembali ke penanganan error manual yang aman.
+4. **Insiden password ter-commit & perbaikannya** — password DB asli sempat ter-commit langsung ke `connect.php` saat rotasi password di server. Sudah dikembalikan ke placeholder; password tersebut sudah dianggap ter-expose di git history dan sebaiknya dirotasi ulang jika belum.
+5. **Vendoring `phpqrcode`** — library QR code yang sebelumnya hanya ada manual di server (tidak tercatat di git, menyebabkan 404 setelah deploy ulang) sekarang di-vendor langsung ke repo ini (`phpqrcode/`) supaya ikut ter-deploy otomatis.
+6. **Restore `generate_link.php`** — sempat terhapus tanpa sadar (bersamaan dengan vendoring `phpqrcode`), padahal ini file inti yang dipanggil form di `index.php` untuk simpan data + generate kode + redirect ke QR generator. Sudah dikembalikan.
+7. **Perbaikan link/QR yang salah domain** — `generate_link.php`, `detail.php`, `phpqrcode/index.php`, `detailtest.php`, dan `passwd-generator/generate_link.php` sebelumnya hardcode base URL yang salah (`https://cordiaz.com/digitalsignature` atau `https://www.cordiaz.com/digitalsignature`), padahal aplikasi berjalan di root domain `https://digitalsignature.cordiaz.com`. Semua sudah diganti membangun base URL secara dinamis dari request saat ini, supaya tidak salah lagi kalau domain/path deployment berubah.
+8. **Redesain UI** — `login.php`, `index.php`, `detail.php`, dan `phpqrcode/index.php` diberi tampilan kartu modern (gradient background, input & tombol bergaya konsisten) menggantikan tabel HTML polos, tanpa mengubah nama field maupun alur PHP yang sudah ada.
+9. **Penyesuaian opsi QR code** — panel "Generate QR Code manual" di `phpqrcode/index.php` di-collapse (tertutup) secara default, dengan nilai default ECC = `Q` dan Size = `4`.
+
+### Yang Masih Perlu Diperhatikan
+
+- Kolom `timestamp` dipakai di `detail.php`/`detailtest.php` tapi tidak ada di skema `sql.sql` — perlu dipastikan apakah kolom ini memang ada di database production atau perlu ditambahkan.
+- `detailtest.php`, `passwd-generator/`, dan file-file `*-ori.php`/`*.ori` adalah kode lama/tidak terpakai di alur aktif — kandidat untuk dihapus jika sudah dipastikan tidak dibutuhkan.
+- Password DB yang sempat ter-commit ke git history (lihat poin 4) sebaiknya dirotasi ulang untuk keamanan jangka panjang.
