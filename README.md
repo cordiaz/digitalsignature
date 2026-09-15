@@ -19,8 +19,7 @@ Aplikasi PHP sederhana untuk membuat link "digital signature" unik per klien, me
 | `connect.php` | Koneksi MySQL (kredensial via env var / `secrets.php`, lihat di bawah). |
 | `load_secrets.php` | Memuat `secrets.php` opsional dari luar document root. |
 | `csrf.php` | Helper token CSRF per-session (`csrf_field()`, `csrf_verify()`) dipakai form login & input klien. |
-| `login.php`, `action-login.php`, `action-logout.php` | Autentikasi sederhana berbasis session (kredensial hardcoded/env var, bukan tabel user). |
-| `session/` | Salinan alur login/app terpisah dengan kredensial berbeda. |
+| `login.php`, `action-login.php`, `action-logout.php` | Autentikasi sederhana berbasis session (kredensial wajib dari env var / `secrets.php`, tidak ada fallback default). |
 | `phpqrcode/` | Library pihak ketiga untuk generate QR code (di-vendor langsung ke repo ini). |
 | `sql.sql` | Skema tabel `tamu`. |
 
@@ -89,6 +88,11 @@ Ringkasan pekerjaan yang sudah dilakukan sampai kondisi saat ini, urut dari yang
 14. **Kolom `timestamp`** — sudah dikonfirmasi ada di database production, meski tidak tercantum di `sql.sql` (skema di repo ini sedikit tertinggal dari skema production).
 15. **Bug penutupan tag PHP dini di `csrf.php`** — komentar penjelasan cara pakai di baris 6 mengandung literal `?>` (contoh potongan kode `<?php echo csrf_field(); ?>`). Komentar `//` di PHP berakhir di baris baru **atau** di `?>`, mana pun lebih dulu, sehingga `?>` tersebut menutup mode PHP untuk seluruh sisa file — definisi `csrf_token()`, `csrf_field()`, dan `csrf_verify()` tidak pernah diparse sebagai kode, melainkan ikut ter-output sebagai teks mentah, sehingga CSRF protection gagal total di production meski file di server sudah sesuai commit terbaru. Diperbaiki dengan menghilangkan literal `?>` dari komentar.
 16. **Password DB tidak sinkron setelah rotasi** — setelah rotasi password di poin 12, sempat terjadi lagi `Access denied for user 't42590_ds'@'localhost'` karena `secrets.php` di server (satu folder di atas document root) tidak/kadaluarsa sinkron dengan password user MySQL yang aktif di Plesk. Diperbaiki dengan menyamakan kembali password di **Plesk → Databases** dan isi `secrets.php`.
+
+17. **Persiapan repo public** — audit sebelum repo ini dijadikan public menemukan dua masalah kredensial:
+    - `action-login.php` (dan salinan lama di `session/action-login.php`, sudah dihapus) punya fallback ke kredensial default (`user`/`user123!?` dan `rizky`/`passwordlogin`) yang ditulis dalam bentuk hash + disebut plaintext-nya di komentar. Kalau `secrets.php` gagal termuat di server (pernah terjadi, lihat poin #16), aplikasi tetap bisa login pakai kredensial default yang sekarang jadi publik. Diperbaiki jadi **fail-closed**: kalau `DS_LOGIN_USERNAME`/`DS_LOGIN_PASSWORD_HASH` tidak diset, semua percobaan login ditolak.
+    - Password DB asli sempat ter-commit plaintext di history git (poin #4, commit `f656de6`). Meski sudah dirotasi (poin #12), history git tetap menyimpan password lama secara plaintext. History di-rewrite untuk menghapusnya sebelum repo dijadikan public.
+    - Folder `session/` (salinan alur login/app lama, tidak dipakai flow aktif) dihapus karena tetap bisa diakses langsung dan memakai kredensial default yang lebih lemah.
 
 ### Yang Masih Perlu Diperhatikan
 

@@ -1,13 +1,13 @@
 <?php
-    // Kredensial dapat dioverride lewat environment variable (atau file
-    // secrets.php di luar document root, lihat load_secrets.php) agar tidak
-    // perlu mengubah kode saat rotasi password. Hash di bawah adalah fallback
-    // untuk password default "user123!?" (bcrypt, dibuat dengan password_hash()).
+    // Kredensial WAJIB datang dari environment variable (atau file secrets.php
+    // di luar document root, lihat load_secrets.php). Tidak ada fallback ke
+    // kredensial default: kalau belum dikonfigurasi, login ditolak (fail-closed)
+    // supaya repo publik ini tidak memuat kredensial tebakan yang bisa dicoba
+    // kalau secrets.php gagal termuat di server.
     include_once __DIR__ . '/load_secrets.php';
     require_once __DIR__ . '/csrf.php';
-    $usernamelogin = getenv('DS_LOGIN_USERNAME') ?: 'user';
-    $passwordlogin_hash = getenv('DS_LOGIN_PASSWORD_HASH')
-        ?: '$2b$10$iiKnY0Kbf9jGuahS1ZcgKeIw/POzLtQ49UkWJEZhZ7HFGSlCnz/LK';
+    $usernamelogin = getenv('DS_LOGIN_USERNAME');
+    $passwordlogin_hash = getenv('DS_LOGIN_PASSWORD_HASH');
 
     // memulai session
     session_start();
@@ -19,6 +19,13 @@
 
     // tolak request tanpa CSRF token yang valid (mis. dari form asing / CSRF attack)
     if (!csrf_verify($csrf_token)) {
+        header("Location: login.php");
+        exit;
+    }
+
+    // kredensial belum dikonfigurasi di server (mis. secrets.php gagal termuat) -> tolak semua login
+    if ($usernamelogin === false || $passwordlogin_hash === false) {
+        error_log("Login ditolak: DS_LOGIN_USERNAME/DS_LOGIN_PASSWORD_HASH belum dikonfigurasi.");
         header("Location: login.php");
         exit;
     }
